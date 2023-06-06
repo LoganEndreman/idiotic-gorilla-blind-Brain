@@ -1,9 +1,9 @@
-Welcome to Lumache's documentation!
+Welcome to The Idiot's Life Manual
 ===================================
 
-**Lumache** (/lu'make/) is a Python library for cooks and food lovers
-that creates recipes mixing random ingredients.
-It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_
+**The Manual**  is a library for idiots and geeks
+that creates life recipes mixing random ingredients.
+It pulls data from the `Your Own Life Experience database <https://world.openfoodfacts.org/>`_
 and offers a *simple* and *intuitive* API.
 
 Check out the :doc:`usage` section for further information, including
