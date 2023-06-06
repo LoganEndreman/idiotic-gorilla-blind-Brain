@@ -6,8 +6,8 @@ that creates life recipes mixing random ingredients.
 It pulls data from the `Your Own Life Experience database <https://world.openfoodfacts.org/>`_
 and offers a *simple* and *intuitive* API.
 
-Check out the :doc:`usage` section for further information, including
-how to :ref:`installation` the project.
+Check out the :doc:`info` section for further information, including
+how to :ref:`understand` the project.
 
 .. note::
 
