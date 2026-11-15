@@ -9,6 +9,12 @@ An Expo (SDK 58, React Native, Expo Router) app for the **WAVE** tabletop RPG.
 
 Dice are rolled **on the server** (Postgres `random()`), and all Block state changes go through `SECURITY DEFINER` RPCs, so players can't edit their own Wave/Void.
 
+## Look & feel
+
+The app looks like a game table. Screens sit on dark purple felt. Panels are raised and bevelled, and buttons are glossy gel. Text fields are recessed, and dice are ivory. The Line of Power gauge is a glass tube with a pewter slider, and the DM turn timer is a green LCD. Character sheets are printed on paper, like the rulebook. The textures are generated tiles in `assets/felt.png` and `assets/paper.png`. Bevels use React Native's `boxShadow`, including inset shadows.
+
+Type is **Helvetica**. iOS uses its built-in Helvetica Neue, and the web asks for Helvetica Neue, then Helvetica, then Arial. Android doesn't ship Helvetica and it can't be bundled without a licence, so Android falls back to the system sans-serif. Use the `Text` component from `src/components/ui.tsx`, not React Native's, so the font is applied.
+
 ## Setup
 
 1. Create a Supabase project.

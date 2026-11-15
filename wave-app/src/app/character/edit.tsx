@@ -1,8 +1,8 @@
 import { Redirect, router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { CharacterCard } from '@/components/CharacterCard';
-import { Body, Btn, Card, Chip, GradientCard, H1, H2, Input, Label, notify, Row, Screen } from '@/components/ui';
+import { Body, Btn, Card, Chip, GradientCard, H1, H2, Input, Label, Row, Screen, Text, notify } from '@/components/ui';
 import {
   ALL_DEFENCES,
   buildTalent,
@@ -122,13 +122,23 @@ type StepProps = { draft: CharacterDraft; set: (p: Partial<CharacterDraft>) => v
 function IdentityStep({ draft, set }: StepProps) {
   return (
     <>
-      <Input label="Character name" value={draft.name} onChangeText={(name) => set({ name })} maxLength={60} placeholder="Kokichi Oma" />
+      <Input
+        label="Character name"
+        value={draft.name}
+        onChangeText={(name) => set({ name })}
+        maxLength={60}
+        placeholder="Kokichi Oma"
+      />
       <Label>Clan</Label>
       <View style={styles.grid}>
         {CLANS.map((c) => {
           const on = draft.clan === c.id;
           return (
-            <Card key={c.id} accent={c.color} style={[styles.clanCard, on && { borderColor: c.color, backgroundColor: colors.surfaceAlt }]}>
+            <Card
+              key={c.id}
+              accent={c.color}
+              style={[styles.clanCard, on && { borderColor: c.color, backgroundColor: colors.surfaceAlt }]}
+            >
               <Text onPress={() => set({ clan: c.id })} style={styles.clanName}>
                 {c.name}
               </Text>
@@ -149,8 +159,8 @@ function TalentsStep({ draft, set }: StepProps) {
   return (
     <>
       <Body muted>
-        For each Skill, combine two words. Talent value = 20 − both penalties (minimum 5) and becomes that Skill's DC. Lower
-        is better. At least one word must come from the Skill's own row.
+        For each Skill, combine two words. Talent value = 20 − both penalties (minimum 5) and becomes that Skill's DC. Lower is
+        better. At least one word must come from the Skill's own row.
       </Body>
       {SKILLS.map((s) => {
         const words = draft.talents[s.id] ?? [];
@@ -223,8 +233,8 @@ function DefencesStep({ draft, set }: StepProps) {
   return (
     <>
       <Body muted>
-        Choose any three Defences (from any clan) and assign −1, −2 and −3. When someone uses a Special-gained Skill die on
-        you, the Defence for their clan × skill reduces that die.
+        Choose any three Defences (from any clan) and assign −1, −2 and −3. When someone uses a Special-gained Skill die on you,
+        the Defence for their clan × skill reduces that die.
       </Body>
       <Card>
         {SKILLS.map((s) => (
@@ -269,10 +279,16 @@ function SpecialStep({ draft, set }: StepProps) {
   return (
     <>
       <Body muted>
-        Your unique ability. Activating it costs 1 Wave: roll three dice, pick one as its effectiveness, and assign the other
-        two to Skills as Skill dice.
+        Your unique ability. Activating it costs 1 Wave: roll three dice, pick one as its effectiveness, and assign the other two
+        to Skills as Skill dice.
       </Body>
-      <Input label="Special name" value={draft.special_name} onChangeText={(special_name) => set({ special_name })} placeholder="DICEy Lies" maxLength={60} />
+      <Input
+        label="Special name"
+        value={draft.special_name}
+        onChangeText={(special_name) => set({ special_name })}
+        placeholder="DICEy Lies"
+        maxLength={60}
+      />
       <Input
         label="What it does"
         value={draft.special_description}
@@ -288,16 +304,24 @@ function IncentivesStep({ draft, set }: StepProps) {
   return (
     <>
       <Body muted>
-        Whichever side of the Line of Power your gauge is on decides which incentive you must fulfil each in-game day.
-        Spending Wave pushes you toward Void.
+        Whichever side of the Line of Power your gauge is on decides which incentive you must fulfil each in-game day. Spending
+        Wave pushes you toward Void.
       </Body>
       <GradientCard kind="wave">
         <Label style={{ color: '#e4f6ff' }}>Wave incentive</Label>
-        <Input value={draft.wave_incentive} onChangeText={(wave_incentive) => set({ wave_incentive })} placeholder="Lie to 10 people for fun." />
+        <Input
+          value={draft.wave_incentive}
+          onChangeText={(wave_incentive) => set({ wave_incentive })}
+          placeholder="Lie to 10 people for fun."
+        />
       </GradientCard>
       <GradientCard kind="void">
         <Label style={{ color: '#ddd0ff' }}>Void incentive</Label>
-        <Input value={draft.void_incentive} onChangeText={(void_incentive) => set({ void_incentive })} placeholder="Lie to one person for harm." />
+        <Input
+          value={draft.void_incentive}
+          onChangeText={(void_incentive) => set({ void_incentive })}
+          placeholder="Lie to one person for harm."
+        />
       </GradientCard>
       <Input label="Notes" value={draft.notes} onChangeText={(notes) => set({ notes })} multiline />
     </>

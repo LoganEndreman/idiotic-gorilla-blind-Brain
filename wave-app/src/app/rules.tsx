@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Body, Card, H2, Label, Screen } from '@/components/ui';
+import { StyleSheet, View } from 'react-native';
+import { Body, Card, H2, Label, Screen, Text } from '@/components/ui';
 import { CLANS, DEFENCE_TABLE, SKILLS, TALENT_WORDS } from '@/game/rules';
 import { colors, space } from '@/theme';
 
@@ -44,7 +44,9 @@ export default function Rules() {
 
       <Card>
         <Label>Rules still to be specified (house rules in this app)</Label>
-        <Body muted>• Starting Wave / Void and gauge — set per Block by its starting DM (defaults 3 Wave, 0 Void, gauge +2).</Body>
+        <Body muted>
+          • Starting Wave / Void and gauge — set per Block by its starting DM (defaults 3 Wave, 0 Void, gauge +2).
+        </Body>
         <Body muted>• How far the gauge moves — 1 step toward Void per Wave spent; the DM can nudge it either way.</Body>
         <Body muted>• How Void is gained — the DM awards it from the DM tab.</Body>
         <Body muted>• When Skill dice expire — they're used up when rolled, or cleared manually.</Body>
@@ -81,8 +83,8 @@ function Table({ cell }: { cell: (clan: (typeof CLANS)[number]['id'], skill: (ty
 
 const styles = StyleSheet.create({
   tr: { flexDirection: 'row', gap: space(2), paddingVertical: space(1.5) },
-  head: { backgroundColor: colors.surfaceAlt, paddingHorizontal: space(3) },
-  bodyRow: { paddingHorizontal: space(3), borderTopWidth: 1, borderTopColor: colors.border },
+  head: { backgroundColor: '#0e0a1c', paddingHorizontal: space(3), paddingVertical: space(2.5) },
+  bodyRow: { paddingHorizontal: space(3), borderTopWidth: 1, borderTopColor: colors.edge },
   th: { color: colors.muted, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   cell: { color: colors.text, fontSize: 14 },
 });

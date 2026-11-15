@@ -1,8 +1,24 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/providers/AuthProvider';
-import { colors } from '@/theme';
+import { colors, engraved, fontFamily } from '@/theme';
+
+function NavBar() {
+  return (
+    <LinearGradient
+      colors={['#4a3b80', '#2a2150', '#1a1333']}
+      locations={[0, 0.5, 1]}
+      style={{
+        flex: 1,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.edge,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 6px rgba(0,0,0,0.6)',
+      }}
+    />
+  );
+}
 
 export default function RootLayout() {
   return (
@@ -11,9 +27,10 @@ export default function RootLayout() {
         <StatusBar style="light" />
         <Stack
           screenOptions={{
-            headerStyle: { backgroundColor: colors.bg },
+            headerBackground: () => <NavBar />,
             headerTintColor: colors.text,
-            headerTitleStyle: { fontWeight: '800' },
+            headerTitleStyle: { fontFamily, fontWeight: '800', ...engraved } as object,
+            headerBackTitleStyle: { fontFamily },
             headerShadowVisible: false,
             contentStyle: { backgroundColor: colors.bg },
           }}

@@ -113,7 +113,7 @@ export function useBlock(blockId: string) {
 
   /** Run an RPC, then refresh (Realtime will too, but this makes the UI snappy). */
   const act = useCallback(
-    async <T,>(fn: string, args: Record<string, unknown> = {}) => {
+    async <T>(fn: string, args: Record<string, unknown> = {}) => {
       const res = await rpc<T>(fn, { p_block: blockId, ...args });
       await Promise.all([loadState(), loadEvents()]);
       return res;

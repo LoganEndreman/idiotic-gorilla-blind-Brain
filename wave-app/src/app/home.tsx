@@ -1,11 +1,11 @@
 import { Link, Redirect, router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { attempt, Body, Btn, Card, H2, Input, Label, Row, Screen } from '@/components/ui';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Body, Btn, Card, H2, Input, Label, Row, Screen, Text, attempt } from '@/components/ui';
 import { Block, clanInfo } from '@/game/rules';
 import { rpc, supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
-import { colors, space } from '@/theme';
+import { colors, engraved, fontFamily, shadows, space } from '@/theme';
 
 type MyBlock = Block & { memberCount: number };
 
@@ -46,7 +46,10 @@ export default function Home() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Link href="/rules" style={{ color: colors.waveLight, fontWeight: '700', paddingHorizontal: 8 }}>
+            <Link
+              href="/rules"
+              style={{ fontFamily, color: colors.waveLight, fontWeight: '700', paddingHorizontal: 12, ...engraved }}
+            >
               Rules
             </Link>
           ),
@@ -140,14 +143,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderLeftWidth: 5,
+    borderColor: colors.edge,
+    borderLeftWidth: 6,
+    boxShadow: shadows.raised,
     padding: space(4),
     flexDirection: 'row',
     alignItems: 'center',
     gap: space(1),
   },
-  charName: { color: colors.text, fontSize: 22, fontWeight: '800', marginVertical: 2 },
-  blockName: { color: colors.text, fontSize: 17, fontWeight: '800', flexShrink: 1 },
+  charName: { color: colors.text, fontSize: 22, fontWeight: '800', marginVertical: 2, ...engraved },
+  blockName: { color: colors.text, fontSize: 17, fontWeight: '800', flexShrink: 1, ...engraved },
   code: { color: colors.waveLight, fontFamily: 'monospace', fontWeight: '700', letterSpacing: 2 },
 });

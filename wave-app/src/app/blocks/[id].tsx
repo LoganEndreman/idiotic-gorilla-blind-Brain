@@ -8,7 +8,7 @@ import { MeTab } from '@/components/block/MeTab';
 import { PartyTab } from '@/components/block/PartyTab';
 import { BlockCtx } from '@/components/block/shared';
 import { TableTab } from '@/components/block/TableTab';
-import { Body, Segmented } from '@/components/ui';
+import { Body, Felt, Segmented } from '@/components/ui';
 import { useBlock } from '@/hooks/useBlock';
 import { useAuth } from '@/providers/AuthProvider';
 import { colors, space } from '@/theme';
@@ -48,37 +48,43 @@ export default function BlockScreen() {
 
   if (!ctx) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg, padding: space(6) }}>
+      <Felt style={{ alignItems: 'center', justifyContent: 'center', padding: space(6) }}>
         {loading || !error ? <ActivityIndicator color={colors.wave} /> : <Body muted>{error}</Body>}
-      </View>
+      </Felt>
     );
   }
 
   return (
-    <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <Stack.Screen options={{ title: ctx.block.name }} />
-      <View style={{ flex: 1, width: '100%', maxWidth: 720, alignSelf: 'center', padding: space(3), gap: space(3) }}>
-        <DmBanner ctx={ctx} />
-        <Segmented<Tab>
-          options={[
-            { value: 'table', label: 'Table' },
-            { value: 'me', label: 'Me' },
-            { value: 'party', label: 'Party' },
-            { value: 'dm', label: ctx.isDm ? 'DM ★' : 'DM' },
-          ]}
-          value={tab}
-          onChange={setTab}
-        />
-        {tab === 'table' ? (
-          <TableTab ctx={ctx} />
-        ) : (
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: space(10) }} keyboardShouldPersistTaps="handled">
-            {tab === 'me' && <MeTab ctx={ctx} />}
-            {tab === 'party' && <PartyTab ctx={ctx} />}
-            {tab === 'dm' && <DmTab ctx={ctx} />}
-          </ScrollView>
-        )}
-      </View>
-    </SafeAreaView>
+    <Felt>
+      <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: ctx.block.name }} />
+        <View style={{ flex: 1, width: '100%', maxWidth: 720, alignSelf: 'center', padding: space(3), gap: space(3) }}>
+          <DmBanner ctx={ctx} />
+          <Segmented<Tab>
+            options={[
+              { value: 'table', label: 'Table' },
+              { value: 'me', label: 'Me' },
+              { value: 'party', label: 'Party' },
+              { value: 'dm', label: ctx.isDm ? 'DM ★' : 'DM' },
+            ]}
+            value={tab}
+            onChange={setTab}
+          />
+          {tab === 'table' ? (
+            <TableTab ctx={ctx} />
+          ) : (
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ paddingBottom: space(10) }}
+              keyboardShouldPersistTaps="handled"
+            >
+              {tab === 'me' && <MeTab ctx={ctx} />}
+              {tab === 'party' && <PartyTab ctx={ctx} />}
+              {tab === 'dm' && <DmTab ctx={ctx} />}
+            </ScrollView>
+          )}
+        </View>
+      </SafeAreaView>
+    </Felt>
   );
 }

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
-import { attempt, Btn, Chip, Input, Row } from '@/components/ui';
+import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { attempt, Btn, Chip, Die, Input, Row, Text } from '@/components/ui';
 import type { BlockEvent } from '@/game/rules';
-import { colors, space } from '@/theme';
+import { colors, engraved, shadows, space } from '@/theme';
 import { BlockCtx } from './shared';
 
 const ROLL_KINDS = new Set(['check', 'skill_die']);
@@ -29,7 +29,11 @@ export function TableTab({ ctx }: { ctx: BlockCtx }) {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={100}
+    >
       <FlatList
         ref={list}
         data={events}
@@ -100,7 +104,13 @@ function EventRow({ ev, ctx }: { ev: BlockEvent; ctx: BlockCtx }) {
         ? colors.warning
         : colors.wave;
   const big =
-    ev.kind === 'check' ? ev.data.roll : ev.kind === 'skill_die' ? ev.data.adjusted : ev.kind === 'special' ? ev.data.effectiveness : null;
+    ev.kind === 'check'
+      ? ev.data.roll
+      : ev.kind === 'skill_die'
+        ? ev.data.adjusted
+        : ev.kind === 'special'
+          ? ev.data.effectiveness
+          : null;
   const refundable = isDm && ev.user_id && (ev.kind === 'talent' || ev.kind === 'special_roll');
 
   return (
@@ -114,11 +124,7 @@ function EventRow({ ev, ctx }: { ev: BlockEvent; ctx: BlockCtx }) {
           {ev.data?.note ? <Text style={styles.note}>“{ev.data.note}”</Text> : null}
           {ev.kind === 'special' && ev.data.description ? <Text style={styles.note}>{ev.data.description}</Text> : null}
         </View>
-        {big != null ? (
-          <View style={[styles.die, { borderColor: accent }]}>
-            <Text style={styles.dieText}>{big}</Text>
-          </View>
-        ) : null}
+        {big != null ? <Die value={big} ring={ROLL_KINDS.has(ev.kind) ? accent : undefined} /> : null}
       </Row>
       {refundable ? (
         <Btn
@@ -144,43 +150,46 @@ function EventRow({ ev, ctx }: { ev: BlockEvent; ctx: BlockCtx }) {
 
 function labelFor(kind: string) {
   return (
-    {
-      check: 'SKILL ROLL',
-      talent: 'TALENT · 1 WAVE',
-      void: '2 VOID',
-      special_roll: 'SPECIAL · 1 WAVE',
-      special: 'SPECIAL RESOLVED',
-      skill_die: 'SKILL DIE',
-      dm_roll: 'DM ROLL',
-      adjust: 'DM ADJUSTMENT',
-    } as Record<string, string>
-  )[kind] ?? kind.toUpperCase();
+    (
+      {
+        check: 'SKILL ROLL',
+        talent: 'TALENT · 1 WAVE',
+        void: '2 VOID',
+        special_roll: 'SPECIAL · 1 WAVE',
+        special: 'SPECIAL RESOLVED',
+        skill_die: 'SKILL DIE',
+        dm_roll: 'DM ROLL',
+        adjust: 'DM ADJUSTMENT',
+      } as Record<string, string>
+    )[kind] ?? kind.toUpperCase()
+  );
 }
 
 const styles = StyleSheet.create({
-  system: { color: colors.faint, fontSize: 12, textAlign: 'center', paddingHorizontal: space(4) },
+  system: { ...engraved, color: colors.muted, fontSize: 12, textAlign: 'center', paddingHorizontal: space(4) },
   chat: { paddingHorizontal: space(1) },
-  author: { color: colors.waveLight, fontWeight: '700', fontSize: 13 },
+  author: { color: colors.waveLight, fontWeight: '700', fontSize: 13, ...engraved },
   time: { color: colors.faint, fontWeight: '400', fontSize: 11 },
   body: { color: colors.text, fontSize: 15, lineHeight: 21 },
   note: { color: colors.muted, fontSize: 13, fontStyle: 'italic' },
   card: {
     backgroundColor: colors.surface,
     borderRadius: 10,
-    borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: colors.edge,
+    borderLeftWidth: 5,
     padding: space(3),
     gap: space(2),
+    boxShadow: shadows.raised,
   },
-  label: { color: colors.muted, fontSize: 10, fontWeight: '800', letterSpacing: 1.3 },
-  die: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.bg,
+  label: { color: colors.muted, fontSize: 10, fontWeight: '800', letterSpacing: 1.3, ...engraved },
+  composer: {
+    gap: space(2),
+    padding: space(2.5),
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.edge,
+    boxShadow: shadows.raised,
   },
-  dieText: { color: colors.text, fontSize: 20, fontWeight: '900' },
-  composer: { gap: space(2), paddingTop: space(2), borderTopWidth: 1, borderTopColor: colors.border },
 });

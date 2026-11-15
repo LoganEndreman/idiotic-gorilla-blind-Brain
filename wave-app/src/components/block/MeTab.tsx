@@ -1,7 +1,22 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Gauge } from '@/components/Gauge';
-import { attempt, Body, Btn, Card, Chip, confirm, GradientCard, Input, Label, Row, Segmented, Stepper } from '@/components/ui';
+import {
+  Body,
+  Btn,
+  Card,
+  Chip,
+  Die,
+  GradientCard,
+  Input,
+  Label,
+  Row,
+  Segmented,
+  Stepper,
+  Text,
+  attempt,
+  confirm,
+} from '@/components/ui';
 import { activeIncentive, defenceFor, Skill, SKILLS, skillName, SkillDie } from '@/game/rules';
 import { colors, space } from '@/theme';
 import { BlockCtx } from './shared';
@@ -124,13 +139,7 @@ function SpecialPanel({ ctx }: { ctx: BlockCtx }) {
       <Body muted>Pick one die for effectiveness. The other two become Skill dice (Charm, Fight or Move — never Talents).</Body>
       <Row style={{ justifyContent: 'center' }} gap={3}>
         {pending.map((d, i) => (
-          <Text
-            key={i}
-            onPress={() => setEffect(i)}
-            style={[styles.bigDie, effect === i && { backgroundColor: colors.text, color: colors.bg, borderColor: colors.text }]}
-          >
-            {d}
-          </Text>
+          <Die key={i} value={d} size={64} selected={effect === i} onPress={() => setEffect(i)} />
         ))}
       </Row>
       {effect != null && (
@@ -176,7 +185,7 @@ function SkillDicePanel({ ctx }: { ctx: BlockCtx }) {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const others = members.filter((m) => m.user_id !== myId);
-  const dc = die ? me.character.talents.find((t) => t.skill === die.skill)?.value ?? 20 : 0;
+  const dc = die ? (me.character.talents.find((t) => t.skill === die.skill)?.value ?? 20) : 0;
   const defence = die ? defenceFor(me.character.clan, die.skill) : '';
   const tgt = others.find((m) => m.user_id === target);
   const penalty = tgt?.character.defences.find((d) => d.name === defence)?.penalty ?? 0;
@@ -189,7 +198,9 @@ function SkillDicePanel({ ctx }: { ctx: BlockCtx }) {
           small
           variant="ghost"
           title="Clear"
-          onPress={() => confirm('Clear Skill dice?', 'Use this when your dice expire.', () => attempt(() => act('discard_skill_dice')))}
+          onPress={() =>
+            confirm('Clear Skill dice?', 'Use this when your dice expire.', () => attempt(() => act('discard_skill_dice')))
+          }
         />
       </Row>
       <Row style={{ flexWrap: 'wrap' }}>
@@ -208,7 +219,12 @@ function SkillDicePanel({ ctx }: { ctx: BlockCtx }) {
           <Row style={{ flexWrap: 'wrap' }}>
             <Chip label="Object / circumstance" selected={target === null} onPress={() => setTarget(null)} />
             {others.map((m) => (
-              <Chip key={m.user_id} label={m.character.name} selected={target === m.user_id} onPress={() => setTarget(m.user_id)} />
+              <Chip
+                key={m.user_id}
+                label={m.character.name}
+                selected={target === m.user_id}
+                onPress={() => setTarget(m.user_id)}
+              />
             ))}
           </Row>
           <Row style={{ justifyContent: 'space-between' }}>
@@ -217,8 +233,12 @@ function SkillDicePanel({ ctx }: { ctx: BlockCtx }) {
           </Row>
           <Body>
             {die.value}
-            {tgt ? (penalty ? ` − ${penalty} (${tgt.character.name}'s ${defence})` : ` (${tgt.character.name} lacks ${defence})`) : ''} ={' '}
-            <Text style={{ fontWeight: '800' }}>{die.value - penalty}</Text> vs DC {dc + mod}
+            {tgt
+              ? penalty
+                ? ` − ${penalty} (${tgt.character.name}'s ${defence})`
+                : ` (${tgt.character.name} lacks ${defence})`
+              : ''}{' '}
+            = <Text style={{ fontWeight: '800' }}>{die.value - penalty}</Text> vs DC {dc + mod}
           </Body>
           <Input value={note} onChangeText={setNote} placeholder="What are you doing? (optional)" />
           <Btn
@@ -246,7 +266,8 @@ function TalentPanel({ ctx }: { ctx: BlockCtx }) {
     <Card>
       <Label>Activate a Talent · 1 Wave · automatic success</Label>
       <Body muted style={{ fontSize: 13 }}>
-        Your next action that clearly matches the Talent succeeds with no roll. If the DM rules it doesn't fit, they refund the Wave.
+        Your next action that clearly matches the Talent succeeds with no roll. If the DM rules it doesn't fit, they refund the
+        Wave.
       </Body>
       {me.character.talents.map((t) => (
         <Row key={t.skill} style={{ justifyContent: 'space-between' }}>
@@ -300,20 +321,14 @@ function VoidPanel({ ctx }: { ctx: BlockCtx }) {
 
 const styles = StyleSheet.create({
   res: { flex: 1, alignItems: 'center' },
-  resNum: { color: '#fff', fontSize: 40, fontWeight: '900' },
+  resNum: {
+    color: '#fff',
+    fontSize: 44,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
+  },
   title: { color: colors.text, fontSize: 18, fontWeight: '800', flexShrink: 1 },
   cost: { color: colors.waveLight, fontWeight: '700', fontSize: 12 },
-  bigDie: {
-    width: 64,
-    height: 64,
-    lineHeight: 60,
-    textAlign: 'center',
-    fontSize: 28,
-    fontWeight: '900',
-    color: colors.text,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
 });

@@ -1,5 +1,6 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
+import { Felt } from '@/components/ui';
 import { useAuth } from '@/providers/AuthProvider';
 import { colors } from '@/theme';
 
@@ -9,9 +10,9 @@ export default function Index() {
   if (!configured) return <Redirect href="/setup" />;
   if (loading)
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg }}>
+      <Felt style={{ alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator color={colors.wave} />
-      </View>
+      </Felt>
     );
   if (!session) return <Redirect href="/sign-in" />;
   if (!character) return <Redirect href="/character/edit" />;

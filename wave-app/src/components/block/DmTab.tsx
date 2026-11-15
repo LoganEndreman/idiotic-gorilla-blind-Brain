@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Share, Text, View } from 'react-native';
-import { attempt, Body, Btn, Card, Chip, confirm, Dot, H2, Input, Label, Row, Stepper } from '@/components/ui';
+import { Share, View } from 'react-native';
+import { Body, Btn, Card, Chip, Dot, H2, Input, Label, Row, Stepper, Text, attempt, confirm } from '@/components/ui';
 import { isOnline } from '@/game/rules';
 import { colors, space } from '@/theme';
 import { BlockCtx, useNow } from './shared';
@@ -35,7 +35,9 @@ export function DmTab({ ctx }: { ctx: BlockCtx }) {
         )}
       </Card>
 
-      {isDm ? <DmTools ctx={ctx} /> : (
+      {isDm ? (
+        <DmTools ctx={ctx} />
+      ) : (
         <Card>
           <Label>DM tools</Label>
           <Body muted>Only the current DM can narrate, roll for the world, adjust Wave/Void and start a new day.</Body>

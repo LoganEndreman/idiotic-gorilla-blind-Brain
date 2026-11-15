@@ -1,110 +1,155 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Card, GradientCard, Label } from '@/components/ui';
+import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet, View } from 'react-native';
+import { Textured } from '@/components/Textured';
+import { Gloss, GradientCard, Label, Text } from '@/components/ui';
 import { Character, clanInfo, SKILLS, talentFor } from '@/game/rules';
-import { colors, space } from '@/theme';
+import { colors, embossed, engraved, gel, shadows, space } from '@/theme';
 
-/** The rulebook's character sheet (§10/§11), rendered from a Character. */
+const PAPER = require('../../assets/paper.png');
+
+/** The rulebook's character sheet (§10/§11), printed on paper and laid on the table. */
 export function CharacterCard({ character, compact }: { character: Character; compact?: boolean }) {
   const clan = clanInfo(character.clan);
   return (
-    <View style={{ gap: space(3) }}>
-      <View style={[styles.header, { backgroundColor: clan.color }]}>
-        <Text style={styles.name} numberOfLines={1}>
+    <Textured source={PAPER} style={styles.sheet} radius={4}>
+      <LinearGradient colors={gel(clan.color)} style={styles.header}>
+        <Gloss radius={6} strength={0.25} />
+        <Text style={[styles.name, engraved]} numberOfLines={1}>
           {character.name}
         </Text>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={styles.clanLabel}>CLAN</Text>
-          <Text style={styles.clan}>
+          <Text style={[styles.clanLabel, engraved]}>CLAN</Text>
+          <Text style={[styles.clan, engraved]}>
             {clan.name} · {clan.epithet}
           </Text>
         </View>
-      </View>
+      </LinearGradient>
 
-      <Card>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={styles.special}>{character.special_name}</Text>
+      <View style={styles.specialBox}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space(2) }}>
+          <Text style={[styles.special, embossed]}>{character.special_name}</Text>
           <Text style={styles.cost}>1 Wave</Text>
         </View>
         {character.special_description ? <Text style={styles.muted}>{character.special_description}</Text> : null}
-      </Card>
+      </View>
 
       <View style={styles.tables}>
-        <Card style={{ flex: 1, minWidth: 220 }}>
-          <View style={styles.tr}>
-            <Label style={{ flex: 1 }}>Skill</Label>
-            <Label style={{ flex: 2 }}>Talent</Label>
-            <Label>DC</Label>
+        <View style={[styles.table, { minWidth: 220 }]}>
+          <View style={styles.th}>
+            <Text style={[styles.thText, { flex: 1 }]}>SKILL</Text>
+            <Text style={[styles.thText, { flex: 2 }]}>TALENT</Text>
+            <Text style={styles.thText}>DC</Text>
           </View>
-          {SKILLS.map((s) => {
+          {SKILLS.map((s, i) => {
             const t = talentFor(character, s.id);
             return (
-              <View key={s.id} style={styles.tr}>
+              <View key={s.id} style={[styles.tr, i % 2 === 1 && styles.zebra]}>
                 <Text style={[styles.cell, { flex: 1, fontWeight: '700' }]}>{s.name}</Text>
                 <Text style={[styles.cell, { flex: 2 }]}>{t?.name ?? '—'}</Text>
                 <Text style={[styles.cell, styles.num]}>{t?.value ?? '—'}</Text>
               </View>
             );
           })}
-        </Card>
-        <Card style={{ flex: 1, minWidth: 180 }}>
-          <View style={styles.tr}>
-            <Label style={{ flex: 1 }}>Defence</Label>
-            <Label>Penalty</Label>
+        </View>
+        <View style={[styles.table, { minWidth: 170 }]}>
+          <View style={styles.th}>
+            <Text style={[styles.thText, { flex: 1 }]}>DEFENCE</Text>
+            <Text style={styles.thText}>PENALTY</Text>
           </View>
           {[...character.defences]
             .sort((a, b) => a.penalty - b.penalty)
-            .map((d) => (
-              <View key={d.name} style={styles.tr}>
+            .map((d, i) => (
+              <View key={d.name} style={[styles.tr, i % 2 === 1 && styles.zebra]}>
                 <Text style={[styles.cell, { flex: 1 }]}>{d.name}</Text>
                 <Text style={[styles.cell, styles.num]}>−{d.penalty}</Text>
               </View>
             ))}
-        </Card>
+        </View>
       </View>
 
       {!compact && (
         <View style={styles.tables}>
           <GradientCard kind="wave" style={{ flex: 1, minWidth: 200 }}>
             <Label style={{ color: '#e4f6ff' }}>Wave incentive</Label>
-            <Text style={styles.incentive}>{character.wave_incentive || '—'}</Text>
+            <Text style={[styles.incentive, engraved]}>{character.wave_incentive || '—'}</Text>
           </GradientCard>
           <GradientCard kind="void" style={{ flex: 1, minWidth: 200 }}>
             <Label style={{ color: '#ddd0ff' }}>Void incentive</Label>
-            <Text style={styles.incentive}>{character.void_incentive || '—'}</Text>
+            <Text style={[styles.incentive, engraved]}>{character.void_incentive || '—'}</Text>
           </GradientCard>
         </View>
       )}
-    </View>
+    </Textured>
   );
 }
 
 const styles = StyleSheet.create({
+  sheet: {
+    backgroundColor: '#f4eede',
+    borderRadius: 4,
+    padding: space(3),
+    gap: space(3),
+    boxShadow: shadows.paper,
+    transform: [{ rotate: '-0.4deg' }],
+  },
   header: {
-    borderRadius: 12,
+    borderRadius: 6,
     padding: space(4),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: space(3),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.35)',
   },
-  name: { color: '#fff', fontSize: 24, fontWeight: '800', flexShrink: 1 },
+  name: { color: '#fff', fontSize: 24, fontWeight: '800', flexShrink: 1, letterSpacing: -0.3 },
   clanLabel: { color: '#ffffffcc', fontSize: 10, fontWeight: '800', letterSpacing: 1.5 },
   clan: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  special: { color: colors.text, fontSize: 18, fontWeight: '800', flexShrink: 1 },
-  cost: {
-    color: colors.waveLight,
-    borderColor: colors.wave,
+  specialBox: {
+    backgroundColor: 'rgba(255,255,255,0.55)',
     borderWidth: 1,
+    borderColor: colors.paperLine,
     borderRadius: 6,
+    padding: space(3),
+    gap: space(1.5),
+  },
+  special: { color: colors.ink, fontSize: 18, fontWeight: '800', flexShrink: 1 },
+  cost: {
+    color: colors.waveDeep,
+    backgroundColor: '#e3f4fc',
+    borderColor: '#9fd6f0',
+    borderWidth: 1,
+    borderRadius: 5,
     paddingHorizontal: 8,
     paddingVertical: 2,
     fontSize: 12,
     fontWeight: '700',
+    overflow: 'hidden',
   },
-  muted: { color: colors.muted, fontSize: 14 },
+  muted: { color: colors.inkMuted, fontSize: 14 },
   tables: { flexDirection: 'row', flexWrap: 'wrap', gap: space(3) },
-  tr: { flexDirection: 'row', alignItems: 'center', gap: space(2) },
-  cell: { color: colors.text, fontSize: 14 },
+  table: {
+    flex: 1,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.paperLine,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  th: { flexDirection: 'row', gap: space(2), backgroundColor: '#1f1b24', paddingHorizontal: space(3), paddingVertical: space(2) },
+  thText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  tr: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space(2),
+    paddingHorizontal: space(3),
+    paddingVertical: space(2),
+    borderTopWidth: 1,
+    borderTopColor: colors.paperLine,
+  },
+  zebra: { backgroundColor: 'rgba(0,0,0,0.035)' },
+  cell: { color: colors.ink, fontSize: 14 },
   num: { fontWeight: '800', minWidth: 28, textAlign: 'right' },
   incentive: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
