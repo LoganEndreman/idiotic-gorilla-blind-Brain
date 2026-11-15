@@ -386,7 +386,11 @@ export function Die({
           .join(', '),
       }}
     >
-      <Text style={[{ color: colors.ink, fontSize: size * 0.44, fontWeight: '900' }, embossed]}>{value}</Text>
+      <Text
+        style={[{ color: colors.ink, fontSize: size * (String(value).length > 2 ? 0.32 : 0.44), fontWeight: '900' }, embossed]}
+      >
+        {value}
+      </Text>
     </LinearGradient>
   );
   return onPress ? <Pressable onPress={onPress}>{face}</Pressable> : face;

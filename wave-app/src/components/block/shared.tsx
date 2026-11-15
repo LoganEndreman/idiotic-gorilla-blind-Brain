@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import type { Block, BlockEvent, BlockMember, QueueEntry } from '@/game/rules';
+import type { Block, BlockEvent, BlockMember, Challenge, QueueEntry } from '@/game/rules';
 
 export type BlockCtx = {
   block: Block;
   members: BlockMember[];
   queue: QueueEntry[];
+  /** Open challenges in this Block. */
+  challenges: Challenge[];
   events: BlockEvent[];
   me: BlockMember;
   myId: string;

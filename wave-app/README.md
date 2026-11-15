@@ -5,7 +5,8 @@ An Expo (SDK 58, React Native, Expo Router) app for the **WAVE** tabletop RPG.
 * **One character per account.** Built with the rulebook's steps: name & clan, three Talents (two words, `20 − A − B`, minimum 5, assigned one per Skill), three Defences with −1/−2/−3, a Special, and Wave/Void incentives.
 * **Blocks** are short-to-medium campaigns in Wave City. Your one character joins any number of Blocks with an invite code. Wave, Void, the Line of Power gauge and Skill dice are tracked separately in each Block.
 * **DM Queue.** Whoever opens a Block is its *starting DM*. When they go offline (no heartbeat for 45 s), the queue takes over: Block members who joined the queue DM in order for 10 minutes each (the starting DM can change the length). Offline players get skipped. When the starting DM comes back, they take over again right away. A queue DM can also end their turn early.
-* **Play:** d20 Skill checks against DC + modifier, Talent activation (1 Wave, auto-success, the DM can refund it), Specials (1 Wave, roll 3 dice, pick effectiveness, assign two Skill dice), Skill dice against other characters with automatic Defence lookup, 2-Void instant success, DM narration and rolls, Wave/Void/gauge adjustments, and "new day" incentive announcements. Every action appears live in the Block's Table log.
+* **Challenges are set by the DM.** The current DM picks who faces the challenge, which Skill it uses and the challenge modifier. They can also pick another character as the opponent, so that character's Defences apply. Each player then meets their challenge in one of four ways: roll a d20 against their Skill DC plus the modifier, use a matching Skill die from their Special, activate a Talent (1 Wave, automatic success), or spend 2 Void (instant success). If a Talent doesn't fit, the DM refunds the Wave and the challenge reopens. Players never choose modifiers themselves.
+* **Also:** Specials (1 Wave, roll 3 dice, pick one for effectiveness, assign the other two as Skill dice), DM narration and world rolls, Wave/Void/gauge adjustments, and "new day" incentive announcements. Every action appears live in the Block's Table log.
 
 Dice are rolled **on the server** (Postgres `random()`), and all Block state changes go through `SECURITY DEFINER` RPCs, so players can't edit their own Wave/Void.
 
@@ -18,7 +19,7 @@ Type is **Helvetica**. iOS uses its built-in Helvetica Neue, and the web asks fo
 ## Setup
 
 1. Create a Supabase project.
-2. Apply the schema: paste `supabase/migrations/20261114000000_wave_schema.sql` into the SQL editor, or run `supabase db push`.
+2. Apply the schema: run the files in `supabase/migrations/` in order in the SQL editor, or run `supabase db push`.
 3. Copy `.env.example` to `.env` and fill in:
    * `EXPO_PUBLIC_SUPABASE_URL`
    * `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the `sb_publishable_…` key; a legacy anon key also works)

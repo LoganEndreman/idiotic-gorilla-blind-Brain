@@ -6,7 +6,7 @@ import { colors, space } from '@/theme';
 const QUICK: [string, string][] = [
   ['Normal action', 'Roll d20 against modified Skill DC'],
   ['Success / failure', 'Roll ≥ DC succeeds; below fails'],
-  ['Modified DC', 'Skill DC + challenge modifier'],
+  ['Modified DC', 'Skill DC + challenge modifier (the DM sets the Skill and modifier)'],
   ['Talent creation', 'Combine two words; 20 − both penalties (minimum 5)'],
   ['Skill DC', 'Value of its assigned Talent'],
   ['Talent activation', '1 Wave — auto-succeed at an action that fits the Talent'],

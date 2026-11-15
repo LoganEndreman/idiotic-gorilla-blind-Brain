@@ -100,7 +100,7 @@ function EventRow({ ev, ctx }: { ev: BlockEvent; ctx: BlockCtx }) {
       : colors.danger
     : ev.kind === 'void'
       ? colors.void
-      : ev.kind === 'adjust' || ev.kind === 'dm_roll'
+      : ev.kind === 'adjust' || ev.kind === 'dm_roll' || ev.kind === 'challenge'
         ? colors.warning
         : colors.wave;
   const big =
@@ -130,17 +130,21 @@ function EventRow({ ev, ctx }: { ev: BlockEvent; ctx: BlockCtx }) {
         <Btn
           small
           variant="ghost"
-          title="Doesn't fit — refund 1 Wave"
+          title={ev.data?.challenge ? "Doesn't fit — refund & reopen challenge" : "Doesn't fit — refund 1 Wave"}
           onPress={() =>
-            attempt(() =>
-              act('dm_adjust', {
+            attempt(async () => {
+              await act('dm_adjust', {
                 p_user: ev.user_id,
                 p_wave: 1,
                 p_void: 0,
                 p_gauge: 1,
                 p_reason: `refund: ${ev.data?.talent ?? ev.data?.special ?? 'action'} didn't fit`,
-              }),
-            )
+              });
+              // A Talent spent on a challenge didn't fit, so the challenge stands.
+              if (ev.kind === 'talent' && ev.data?.challenge) {
+                await act('dm_reopen_challenge', { p_challenge: ev.data.challenge });
+              }
+            })
           }
         />
       ) : null}
@@ -159,6 +163,7 @@ function labelFor(kind: string) {
         special: 'SPECIAL RESOLVED',
         skill_die: 'SKILL DIE',
         dm_roll: 'DM ROLL',
+        challenge: 'DM SETS A CHALLENGE',
         adjust: 'DM ADJUSTMENT',
       } as Record<string, string>
     )[kind] ?? kind.toUpperCase()

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
-import type { Block, BlockEvent, BlockMember, QueueEntry } from '@/game/rules';
+import type { Block, BlockEvent, BlockMember, Challenge, QueueEntry } from '@/game/rules';
 import { HEARTBEAT_MS } from '@/game/rules';
 import { rpc, supabase } from '@/lib/supabase';
 
@@ -16,6 +16,7 @@ export function useBlock(blockId: string) {
   const [block, setBlock] = useState<Block | null>(null);
   const [members, setMembers] = useState<BlockMember[]>([]);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [events, setEvents] = useState<BlockEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,12 +24,13 @@ export function useBlock(blockId: string) {
 
   const loadState = useCallback(async () => {
     const db = supabase();
-    const [b, m, q] = await Promise.all([
+    const [b, m, q, c] = await Promise.all([
       db.from('blocks').select('*').eq('id', blockId).maybeSingle(),
       db.from('block_members').select('*, character:characters(*)').eq('block_id', blockId).order('joined_at'),
       db.from('dm_queue').select('*').eq('block_id', blockId).order('joined_at'),
+      db.from('challenges').select('*').eq('block_id', blockId).eq('status', 'open').order('created_at'),
     ]);
-    const err = b.error ?? m.error ?? q.error;
+    const err = b.error ?? m.error ?? q.error ?? c.error;
     if (err) {
       setError(err.message);
       return;
@@ -41,6 +43,7 @@ export function useBlock(blockId: string) {
     setBlock(b.data as Block);
     setMembers((m.data ?? []) as BlockMember[]);
     setQueue((q.data ?? []) as QueueEntry[]);
+    setChallenges((c.data ?? []) as Challenge[]);
   }, [blockId]);
 
   const loadEvents = useCallback(async () => {
@@ -121,5 +124,5 @@ export function useBlock(blockId: string) {
     [blockId, loadEvents, loadState],
   );
 
-  return { block, members, queue, events, error, loading, act, reload: loadState };
+  return { block, members, queue, challenges, events, error, loading, act, reload: loadState };
 }

@@ -18,7 +18,7 @@ type Tab = 'table' | 'me' | 'party' | 'dm';
 export default function BlockScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useAuth();
-  const { block, members, queue, events, error, loading, act } = useBlock(id);
+  const { block, members, queue, challenges, events, error, loading, act } = useBlock(id);
   const [tab, setTab] = useState<Tab>('table');
   const myId = session?.user.id ?? '';
 
@@ -34,6 +34,7 @@ export default function BlockScreen() {
       block,
       members,
       queue,
+      challenges,
       events,
       me,
       myId,
@@ -42,9 +43,10 @@ export default function BlockScreen() {
       act: act as BlockCtx['act'],
       nameOf,
     };
-  }, [act, block, events, members, myId, nameOf, queue]);
+  }, [act, block, challenges, events, members, myId, nameOf, queue]);
 
   if (!session) return <Redirect href="/" />;
+  const myOpen = challenges.filter((c) => c.target_user === myId).length;
 
   if (!ctx) {
     return (
@@ -63,7 +65,7 @@ export default function BlockScreen() {
           <Segmented<Tab>
             options={[
               { value: 'table', label: 'Table' },
-              { value: 'me', label: 'Me' },
+              { value: 'me', label: myOpen ? `Me (${myOpen})` : 'Me' },
               { value: 'party', label: 'Party' },
               { value: 'dm', label: ctx.isDm ? 'DM ★' : 'DM' },
             ]}

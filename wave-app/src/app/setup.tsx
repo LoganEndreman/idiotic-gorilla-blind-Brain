@@ -11,7 +11,7 @@ export default function Setup() {
       <Card>
         <Label>1 · Create the database</Label>
         <Body>
-          Run <Code>supabase/migrations/…_wave_schema.sql</Code> in your project (SQL editor, or <Code>supabase db push</Code>).
+          Run the files in <Code>supabase/migrations/</Code> in order (SQL editor, or <Code>supabase db push</Code>).
         </Body>
         <Label>2 · Add your keys</Label>
         <Body>

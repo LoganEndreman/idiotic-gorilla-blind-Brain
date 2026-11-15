@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Share, View } from 'react-native';
-import { Body, Btn, Card, Chip, Dot, H2, Input, Label, Row, Stepper, Text, attempt, confirm } from '@/components/ui';
-import { isOnline } from '@/game/rules';
+import { attempt, Body, Btn, Card, Chip, confirm, Dot, H2, Input, Label, Row, Segmented, Stepper, Text } from '@/components/ui';
+import { isOnline, Skill, SKILLS, skillName } from '@/game/rules';
 import { colors, space } from '@/theme';
 import { BlockCtx, useNow } from './shared';
 
@@ -13,6 +13,9 @@ export function DmTab({ ctx }: { ctx: BlockCtx }) {
 
   return (
     <View style={{ gap: space(4) }}>
+      {isDm && <SetChallenge ctx={ctx} />}
+      <OpenChallenges ctx={ctx} />
+
       <Card>
         <Label>DM Queue</Label>
         <Body muted style={{ fontSize: 13 }}>
@@ -40,7 +43,9 @@ export function DmTab({ ctx }: { ctx: BlockCtx }) {
       ) : (
         <Card>
           <Label>DM tools</Label>
-          <Body muted>Only the current DM can narrate, roll for the world, adjust Wave/Void and start a new day.</Body>
+          <Body muted>
+            Only the current DM can set challenges, narrate, roll for the world, adjust Wave/Void and start a new day.
+          </Body>
         </Card>
       )}
 
@@ -77,6 +82,138 @@ export function DmTab({ ctx }: { ctx: BlockCtx }) {
   );
 }
 
+/** The DM picks who faces it, which Skill it uses and the challenge modifier (§6). */
+function SetChallenge({ ctx }: { ctx: BlockCtx }) {
+  const { members, act, block } = ctx;
+  const players = members.filter((m) => m.user_id !== block.current_dm_id);
+  const [targets, setTargets] = useState<string[]>([]);
+  const [skill, setSkill] = useState<Skill>('charm');
+  const [modifier, setModifier] = useState(0);
+  const [opponent, setOpponent] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const toggle = (id: string) => setTargets((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
+  const allOn = players.length > 0 && players.every((p) => targets.includes(p.user_id));
+
+  return (
+    <Card accent={colors.warning}>
+      <H2>Set a challenge</H2>
+      <Label>Who faces it</Label>
+      <Row style={{ flexWrap: 'wrap' }}>
+        <Chip
+          label="Everyone"
+          color={colors.warning}
+          selected={allOn}
+          onPress={() => setTargets(allOn ? [] : players.map((p) => p.user_id))}
+        />
+        {players.map((m) => (
+          <Chip
+            key={m.user_id}
+            label={m.character.name}
+            selected={targets.includes(m.user_id)}
+            onPress={() => toggle(m.user_id)}
+          />
+        ))}
+      </Row>
+      <Label>Skill</Label>
+      <Segmented options={SKILLS.map((s) => ({ value: s.id, label: s.name }))} value={skill} onChange={setSkill} />
+      <Row style={{ justifyContent: 'space-between' }}>
+        <Body>Challenge modifier</Body>
+        <Stepper value={modifier} onChange={setModifier} />
+      </Row>
+      <Body muted style={{ fontSize: 13 }}>
+        Each player needs their own {skillName(skill)} DC{modifier ? ` ${modifier > 0 ? '+' : '−'} ${Math.abs(modifier)}` : ''} or
+        higher.
+      </Body>
+      <Label>The challenge is…</Label>
+      <Row style={{ flexWrap: 'wrap' }}>
+        <Chip label="An NPC, object or circumstance" selected={opponent === null} onPress={() => setOpponent(null)} />
+        {members
+          .filter((m) => m.user_id !== block.current_dm_id)
+          .map((m) => (
+            <Chip
+              key={m.user_id}
+              label={m.character.name}
+              color={colors.danger}
+              selected={opponent === m.user_id}
+              onPress={() => {
+                setOpponent(m.user_id);
+                setTargets((t) => t.filter((x) => x !== m.user_id));
+              }}
+            />
+          ))}
+      </Row>
+      {opponent ? (
+        <Body muted style={{ fontSize: 13 }}>
+          {ctx.nameOf(opponent)}'s Defences will reduce Skill dice used against them.
+        </Body>
+      ) : null}
+      <Input
+        value={description}
+        onChangeText={setDescription}
+        placeholder="What's the challenge? e.g. Talk past the dock guard"
+      />
+      <Btn
+        title={targets.length > 1 ? `Set for ${targets.length} players` : 'Set challenge'}
+        variant="primary"
+        loading={busy}
+        disabled={targets.length === 0}
+        onPress={() => {
+          setBusy(true);
+          attempt(async () => {
+            await act('dm_set_challenge', {
+              p_targets: targets,
+              p_skill: skill,
+              p_modifier: modifier,
+              p_description: description,
+              p_opponent: opponent,
+            });
+            setTargets([]);
+            setDescription('');
+            setModifier(0);
+            setOpponent(null);
+          }).finally(() => setBusy(false));
+        }}
+      />
+    </Card>
+  );
+}
+
+function OpenChallenges({ ctx }: { ctx: BlockCtx }) {
+  const { challenges, nameOf, isDm, act } = ctx;
+  if (challenges.length === 0) return null;
+  return (
+    <Card>
+      <Label>Open challenges</Label>
+      {challenges.map((c) => (
+        <Row key={c.id} style={{ justifyContent: 'space-between' }}>
+          <View style={{ flex: 1 }}>
+            <Body style={{ fontWeight: '700' }}>
+              {nameOf(c.target_user)}: {skillName(c.skill)}
+              {c.modifier ? ` ${c.modifier > 0 ? '+' : '−'}${Math.abs(c.modifier)}` : ''}
+              {c.opponent_user ? ` vs ${nameOf(c.opponent_user)}` : ''}
+            </Body>
+            {c.description ? (
+              <Body muted style={{ fontSize: 13 }}>
+                {c.description}
+              </Body>
+            ) : null}
+          </View>
+          {isDm ? (
+            <Btn
+              small
+              variant="ghost"
+              title="Withdraw"
+              onPress={() => attempt(() => act('dm_cancel_challenge', { p_challenge: c.id }))}
+            />
+          ) : null}
+        </Row>
+      ))}
+    </Card>
+  );
+}
+
 function DmTools({ ctx }: { ctx: BlockCtx }) {
   const { members, act, block } = ctx;
   const [count, setCount] = useState(1);
@@ -90,7 +227,7 @@ function DmTools({ ctx }: { ctx: BlockCtx }) {
   return (
     <>
       <Card accent={colors.void}>
-        <H2>You are the DM</H2>
+        <H2>World & players</H2>
         <Label>Roll for the world</Label>
         <Row style={{ justifyContent: 'space-between' }}>
           <Body muted>Number of d20</Body>

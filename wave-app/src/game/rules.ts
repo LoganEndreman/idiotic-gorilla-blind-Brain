@@ -200,6 +200,20 @@ export type BlockMember = {
   character: Character;
 };
 
+/** A challenge the current DM has set for one player (§6). */
+export type Challenge = {
+  id: string;
+  block_id: string;
+  created_by: string | null;
+  target_user: string;
+  skill: Skill;
+  modifier: number;
+  opponent_user: string | null;
+  description: string;
+  status: 'open' | 'resolved' | 'cancelled';
+  created_at: string;
+};
+
 export type QueueEntry = { block_id: string; user_id: string; joined_at: string };
 
 export type BlockEvent = {
